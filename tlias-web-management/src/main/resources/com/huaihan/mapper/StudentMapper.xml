@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huaihan.mapper.StudentMapper">
+
+    <!--用于学员列表数据的条件分页查询-->
+    <!--PageHelper插件不能有分号！！！！！！-->
+    <select id="pageFindAllStudent" resultType="com.huaihan.pojo.Student">
+        SELECT s.*,
+        c.name clazzName,
+        (case
+        when s.degree = 1 then '初中'
+        when s.degree = 2 then '高中'
+        when s.degree = 3 then '大专'
+        when s.degree = 4 then '本科'
+        when s.degree = 5 then '硕士'
+        when s.degree = 6 then '博士'
+        end)
+        FROM student s LEFT JOIN clazz c on s.clazz_id = c.id
+        <where>
+            <if test="name != null and name !=''">
+                s.name LIKE concat('%',#{name},'%')
+            </if>
+            <if test="degree != null">
+                AND s.degree = #{degree}
+            </if>
+            <if test="clazzId != null">
+                AND s.clazz_id = #{clazzId}
+            </if>
+        </where>
+        ORDER BY s.update_time desc
+    </select>
+
+    <!--根据id删除学员-->
+    <delete id="deleteStudent">
+        DELETE FROM student WHERE id IN
+        # 集合参数名 每个元素的别名 元素间分隔符 开始字符串 结尾字符串
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--添加学员-->
+    <insert id="addStudent">
+        INSERT INTO student(name, no, gender, phone, id_card, is_college, address, degree, graduation_date, clazz_id,
+                            create_time, update_time)
+        # VALUES ('丽莎','2025010509',2,'15887989865',159080878965450909,1,'辽宁沈阳',4,'2025-09-08',9,'2025-09-09','2025-09-09');
+        VALUES (#{name}, #{no}, #{gender}, #{phone}, #{idCard}, #{isCollege}, #{address}, #{degree}, #{graduationDate},
+                #{clazzId}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!--数据回显，根据ID查询学员-->
+    <select id="findStudentById" resultType="com.huaihan.pojo.Student">
+        SELECT s.*, c.name
+        FROM student s
+                 LEFT JOIN clazz c ON s.clazz_id = c.id
+        WHERE s.id = #{id}
+    </select>
+
+    <!--修改学员-->
+    <update id="updateStudent">
+        UPDATE student
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="no != null and no != ''">
+                no = #{no},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="degree != null">
+                degree = #{degree},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="idCard != null and idCard != ''">
+                id_card = #{idCard},
+            </if>
+            <if test="isCollege != null">
+                is_college = #{isCollege},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="graduationDate != null">
+                graduation_date = #{graduationDate},
+            </if>
+            <if test="violationCount != null">
+                violation_count = #{violationCount},
+            </if>
+            <if test="violationScore != null">
+                violation_score = #{violationScore},
+            </if>
+            <if test="clazzId != null">
+                clazz_id = #{clazzId},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        WHERE id = #{id};
+    </update>
+
+    <!--    统计学员学历-->
+    <select id="getStudentDegreeData" resultType="java.util.Map">
+        select (case
+                    when degree = 1 then '初中'
+                    when degree = 2 then '高中'
+                    when degree = 3 then '大专'
+                    when degree = 4 then '本科'
+                    when degree = 5 then '硕士'
+                    when degree = 6 then '博士'
+            end) name,
+               count(*) value
+        from student
+        group by degree
+    </select>
+<!--    统计班级人数-->
+    <select id="getStudentCountData" resultType="java.util.Map">
+        SELECT
+            c.name clazzName,
+            COUNT(s.id) stuNum
+        FROM clazz c
+                 LEFT JOIN student s ON c.id = s.clazz_id
+        GROUP BY c.id, c.name
+        ORDER BY stuNum;
+    </select>
+</mapper>

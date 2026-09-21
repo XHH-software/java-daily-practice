@@ -1,0 +1,17 @@
+# IDEA 相关全部忽略
+.idea/
+*.iml
+
+# 所有子项目里面的target打包目录（**代表所有子文件夹）
+**/target/
+
+# 日志文件
+**/logs/
+*.log
+
+# 系统垃圾文件
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp

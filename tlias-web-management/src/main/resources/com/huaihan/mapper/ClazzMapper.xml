@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huaihan.mapper.ClazzMapper">
+    <!--分页查询，班级列表查询-->
+    <select id="PageResult" resultType="com.huaihan.pojo.Clazz">
+        SELECT c.*,
+        e.name masterName,
+        (case
+        when NOW() > c.end_date then '已结课'
+        when c.begin_date > NOW() then '未开班'
+        else '在读中' end) status
+        FROM clazz c Left Join emp e on c.master_id = e.id
+        <where>
+            <if test="name != null and name != ''">
+                c.name like concat('%',#{name},'%')
+            </if>
+<!--            <if test="begin != null and end != null">-->
+<!--                and c.end_date between #{begin} and #{end}-->
+<!--            </if>-->
+            <if test="begin != null">
+                and c.end_date >= #{begin}
+            </if>
+            <if test="end != null">
+                and  #{end} >= c.end_date
+            </if>
+        </where>
+    </select>
+
+    <!--修改班级，更新数据-->
+    <update id="updateClazz">
+        update clazz
+        <set>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="room != null and room != ''">room = #{room},</if>
+            <if test="beginDate != null">begin_date = #{beginDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="masterId != null">master_id = #{masterId},</if>
+            <if test="subject != null">subject = #{subject},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

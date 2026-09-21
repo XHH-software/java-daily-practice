@@ -1,0 +1,31 @@
+#配置项目的名字
+spring:
+  application:
+    name: tlias-web-management
+#配置数据库的连接
+  datasource:
+    url: jdbc:mysql://localhost:3306/tlias
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+
+#Mybatis配置-日志
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #驼峰命名映射开关
+    map-underscore-to-camel-case: on
+#配置日志信息，查看spring事务管理的底层日志
+logging:
+  level:
+    root: info
+    # 打印事务日
+    org.springframework.jdbc.support.JdbcTransactionManager: debug
+    # mybatis sql日志（看到执行sql、参数，你现在日志已经有）
+    com.huanhan.mapper: debug
+#阿里云OSS
+aliyun:
+  oss:
+    endpoint: https://oss-cn-beijing.aliyuncs.com
+    bucketName: java-huaihan
+    region: cn-beijing
