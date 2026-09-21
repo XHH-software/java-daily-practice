@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: tlias-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tlias
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    restart: always
+    # 字符集配置
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+
+  tlias-web:
+    build: .
+    container_name: tlias-web
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      # 等待mysql启动，yml里面数据库地址改成 mysql （容器名作为hostname）
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tlias?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123456
+    restart: always
